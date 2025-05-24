@@ -23,8 +23,8 @@ historiX_show_menu() {
             historiX_show_help
             ;;
         3)
-            echo -e "${YELLOW}Analysis Options:${NC} a) Top Commands  b) Usage by Hour  c) Search  d) Trend  e) Session Stats  f) Length/Complexity  g) Tag Command  h) Filter by Tag"
-            read -p "Select analysis [a-h]: " subchoice
+            echo -e "${YELLOW}Analysis Options:${NC} a) Top Commands  b) Usage by Hour  c) Search  d) Trend  e) Session Stats  f) Length/Complexity  g) Tag Command  h) Filter by Tag  i) Timeline  j) Replay Session  k) Predict Next"
+            read -p "Select analysis [a-k]: " subchoice
             case $subchoice in
                 a|A)
                     historiX_analyze_history
@@ -50,6 +50,15 @@ historiX_show_menu() {
                 h|H)
                     historiX_filter_by_tag
                     ;;
+                i|I)
+                    historiX_timeline_drilldown
+                    ;;
+                j|J)
+                    historiX_replay_session
+                    ;;
+                k|K)
+                    historiX_predict_next_command
+                    ;;
                 *)
                     echo "Invalid analysis option."
                     ;;
@@ -74,8 +83,8 @@ historiX_show_menu() {
             esac
             ;;
         5)
-            echo -e "${YELLOW}Export Options:${NC} a) Top Commands CSV  b) Full History JSON  c) Printable Report"
-            read -p "Select export [a-c]: " subchoice
+            echo -e "${YELLOW}Export Options:${NC} a) Top Commands CSV  b) Full History JSON  c) Printable Report  d) Google Sheets CSV  e) HTML Report"
+            read -p "Select export [a-e]: " subchoice
             case $subchoice in
                 a|A)
                     historiX_export_top_commands_csv
@@ -85,6 +94,12 @@ historiX_show_menu() {
                     ;;
                 c|C)
                     historiX_export_printable_report
+                    ;;
+                d|D)
+                    historiX_export_google_sheets
+                    ;;
+                e|E)
+                    historiX_generate_html_report
                     ;;
                 *)
                     echo "Invalid export option."

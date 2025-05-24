@@ -309,3 +309,99 @@ historiX_suggest_aliases() {
     echo "[Alias Suggestions for Long Commands]"
     grep -v '^#' "$histfile" | awk 'length($0)>30' | sort | uniq -c | sort -rn | head -5 | awk '{print "alias cmd" NR "=\"" substr($0, index($0,$2)) "\""}'
 }
+
+# Interactive timeline/drilldown: Explore command usage by date
+historiX_timeline_drilldown() {
+    local histfile histfmt date
+    histfile=$(historiX_detect_shell_and_history)
+    histfmt=$(historiX_get_history_format)
+    if [ -z "$histfile" ]; then
+        echo "No history file found."
+        return 1
+    fi
+    echo "[Timeline: Command usage by date]"
+    if [[ "$histfmt" == zsh-timestamped ]]; then
+        awk -F: '/^:/ {print strftime("%Y-%m-%d", $2)}' "$histfile" | sort | uniq -c | sort -k2 | awk '{printf "%s: %d\n", $2, $1}'
+        read -p "Enter a date (YYYY-MM-DD) to drill down: " date
+        awk -F: -v d="$date" '/^:/ {if(strftime("%Y-%m-%d", $2)==d){getline cmd; print cmd}}' "$histfile" | less
+    elif [[ "$histfmt" == bash-timestamped ]]; then
+        awk '/^#/ {print strftime("%Y-%m-%d", substr($0,2))}' "$histfile" | sort | uniq -c | sort -k2 | awk '{printf "%s: %d\n", $2, $1}'
+        read -p "Enter a date (YYYY-MM-DD) to drill down: " date
+        awk '/^#/ {t=substr($0,2); if(strftime("%Y-%m-%d", t)==d){getline cmd; print cmd}}' d="$date" "$histfile" | less
+    else
+        echo "Timeline requires timestamped history."
+    fi
+}
+
+# Integration: Export top commands to Google Sheets CSV (user uploads manually)
+historiX_export_google_sheets() {
+    local histfile outfile
+    histfile=$(historiX_detect_shell_and_history)
+    outfile="${HOME}/historiX_gsheets_$(date +%Y%m%d%H%M%S).csv"
+    if [ -z "$histfile" ]; then
+        echo "No history file found."
+        return 1
+    fi
+    grep -v '^#' "$histfile" | sed 's/^: [0-9]*:[0-9]*;//' | awk '{print $1}' | sort | uniq -c | sort -rn | head -20 | awk 'BEGIN{print "Count,Command"} {print $1 "," $2}' > "$outfile"
+    echo "CSV for Google Sheets exported to $outfile. Upload it to Google Sheets manually."
+}
+
+# Session replay: Output a session as a shell script
+historiX_replay_session() {
+    local histfile histfmt date outfile
+    histfile=$(historiX_detect_shell_and_history)
+    histfmt=$(historiX_get_history_format)
+    outfile="${HOME}/historiX_session_replay_$(date +%Y%m%d%H%M%S).sh"
+    if [ -z "$histfile" ]; then
+        echo "No history file found."
+        return 1
+    fi
+    if [[ "$histfmt" == zsh-timestamped || "$histfmt" == bash-timestamped ]]; then
+        read -p "Enter session date (YYYY-MM-DD): " date
+        if [[ "$histfmt" == zsh-timestamped ]]; then
+            awk -F: -v d="$date" '/^:/ {if(strftime("%Y-%m-%d", $2)==d){getline cmd; print cmd}}' "$histfile" > "$outfile"
+        else
+            awk '/^#/ {t=substr($0,2); if(strftime("%Y-%m-%d", t)==d){getline cmd; print cmd}}' d="$date" "$histfile" > "$outfile"
+        fi
+        chmod +x "$outfile"
+        echo "Session script saved to $outfile. You can replay it with: bash $outfile"
+    else
+        echo "Session replay requires timestamped history."
+    fi
+}
+
+# Advanced reporting: Generate HTML report
+historiX_generate_html_report() {
+    local histfile outfile
+    histfile=$(historiX_detect_shell_and_history)
+    outfile="${HOME}/historiX_report_$(date +%Y%m%d%H%M%S).html"
+    if [ -z "$histfile" ]; then
+        echo "No history file found."
+        return 1
+    fi
+    echo "<html><head><title>HistoriX Report</title></head><body>" > "$outfile"
+    echo "<h1>HistoriX Command Usage Report</h1>" >> "$outfile"
+    echo "<h2>Top Commands</h2><pre>" >> "$outfile"
+    grep -v '^#' "$histfile" | sed 's/^: [0-9]*:[0-9]*;//' | awk '{print $1}' | sort | uniq -c | sort -rn | head -10 >> "$outfile"
+    echo "</pre><h2>Total Commands</h2><pre>" >> "$outfile"
+    grep -v '^#' "$histfile" | wc -l >> "$outfile"
+    echo "</pre></body></html>" >> "$outfile"
+    echo "HTML report generated at $outfile"
+}
+
+# Machine learning insights: Predict next likely command (simple Markov model)
+historiX_predict_next_command() {
+    local histfile prev next
+    histfile=$(historiX_detect_shell_and_history)
+    if [ -z "$histfile" ]; then
+        echo "No history file found."
+        return 1
+    fi
+    read -p "Enter previous command: " prev
+    next=$(grep -v '^#' "$histfile" | sed 's/^: [0-9]*:[0-9]*;//' | awk -v p="$prev" 'last==p{print $1} {last=$1}' | sort | uniq -c | sort -rn | head -1 | awk '{print $2}')
+    if [ -n "$next" ]; then
+        echo "Predicted next command: $next"
+    else
+        echo "No prediction available."
+    fi
+}
