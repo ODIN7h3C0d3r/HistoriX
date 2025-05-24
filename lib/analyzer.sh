@@ -241,3 +241,71 @@ historiX_restore_history() {
     cp "$backupfile" "$histfile"
     echo "History restored from $backupfile."
 }
+
+# Multi-user and multi-host support: Merge and analyze multiple history files
+historiX_merge_histories() {
+    local files merged_file
+    read -p "Enter paths to history files (space-separated): " files
+    merged_file="${HOME}/historiX_merged_history_$(date +%Y%m%d%H%M%S).txt"
+    cat $files > "$merged_file"
+    echo "Merged history saved to $merged_file"
+}
+
+historiX_compare_histories() {
+    local file1 file2
+    read -p "Enter first history file: " file1
+    read -p "Enter second history file: " file2
+    if [ ! -f "$file1" ] || [ ! -f "$file2" ]; then
+        echo "Both files must exist."
+        return 1
+    fi
+    echo "Commands unique to $file1:"
+    grep -vxFf "$file2" "$file1"
+    echo
+    echo "Commands unique to $file2:"
+    grep -vxFf "$file1" "$file2"
+}
+
+# Command tagging and annotation: Tag commands in history
+historiX_tag_command() {
+    local histfile tag pattern
+    histfile=$(historiX_detect_shell_and_history)
+    read -p "Enter pattern to tag: " pattern
+    read -p "Enter tag: " tag
+    awk -v pat="$pattern" -v tag="$tag" '{if($0~pat){print $0 " #tag:" tag} else {print $0}}' "$histfile" > "$histfile.tagged"
+    mv "$histfile.tagged" "$histfile"
+    echo "Commands matching '$pattern' tagged as '$tag'."
+}
+
+# Filter by tag
+historiX_filter_by_tag() {
+    local histfile tag
+    histfile=$(historiX_detect_shell_and_history)
+    read -p "Enter tag to filter: " tag
+    grep "#tag:$tag" "$histfile"
+}
+
+# Notifications: Alert on dangerous commands
+historiX_check_dangerous_commands() {
+    local histfile
+    histfile=$(historiX_detect_shell_and_history)
+    if [ -z "$histfile" ]; then
+        echo "No history file found."
+        return 1
+    fi
+    echo "[Checking for dangerous commands...]"
+    grep -E 'rm -rf /|:(){:|:&};:|dd if=|mkfs|:(){:|:&};:|wget http|curl http' "$histfile" && \
+    echo "Warning: Dangerous command(s) found!" || echo "No dangerous commands detected."
+}
+
+# Suggest aliases for frequently used long commands
+historiX_suggest_aliases() {
+    local histfile
+    histfile=$(historiX_detect_shell_and_history)
+    if [ -z "$histfile" ]; then
+        echo "No history file found."
+        return 1
+    fi
+    echo "[Alias Suggestions for Long Commands]"
+    grep -v '^#' "$histfile" | awk 'length($0)>30' | sort | uniq -c | sort -rn | head -5 | awk '{print "alias cmd" NR "=\"" substr($0, index($0,$2)) "\""}'
+}

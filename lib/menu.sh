@@ -2,6 +2,9 @@
 
 # Interactive menu for HistoriX
 historiX_show_menu() {
+    # Call config loader and theme applier at menu start
+    historiX_load_config
+    historiX_apply_theme
     clear
     historiX_ascii_banner
     echo -e "${CYAN}Welcome to HistoriX!${NC}"
@@ -20,8 +23,8 @@ historiX_show_menu() {
             historiX_show_help
             ;;
         3)
-            echo -e "${YELLOW}Analysis Options:${NC} a) Top Commands  b) Usage by Hour  c) Search  d) Trend  e) Session Stats  f) Length/Complexity"
-            read -p "Select analysis [a-f]: " subchoice
+            echo -e "${YELLOW}Analysis Options:${NC} a) Top Commands  b) Usage by Hour  c) Search  d) Trend  e) Session Stats  f) Length/Complexity  g) Tag Command  h) Filter by Tag"
+            read -p "Select analysis [a-h]: " subchoice
             case $subchoice in
                 a|A)
                     historiX_analyze_history
@@ -40,6 +43,12 @@ historiX_show_menu() {
                     ;;
                 f|F)
                     historiX_command_length_complexity
+                    ;;
+                g|G)
+                    historiX_tag_command
+                    ;;
+                h|H)
+                    historiX_filter_by_tag
                     ;;
                 *)
                     echo "Invalid analysis option."
@@ -125,8 +134,8 @@ historiX_show_menu() {
             esac
             ;;
         8)
-            echo -e "${YELLOW}Info:${NC} a) Shell Info  b) Core Summary  c) About"
-            read -p "Select info [a-c]: " subchoice
+            echo -e "${YELLOW}Info:${NC} a) Shell Info  b) Core Summary  c) About  d) List Plugins  e) Merge Histories  f) Compare Histories  g) Check Dangerous Cmds  h) Suggest Aliases"
+            read -p "Select info [a-h]: " subchoice
             case $subchoice in
                 a|A)
                     historiX_show_shell_info
@@ -136,6 +145,21 @@ historiX_show_menu() {
                     ;;
                 c|C)
                     echo "HistoriX - Bash History Analyzer v0.1.0 by Onyx"
+                    ;;
+                d|D)
+                    historiX_list_plugins
+                    ;;
+                e|E)
+                    historiX_merge_histories
+                    ;;
+                f|F)
+                    historiX_compare_histories
+                    ;;
+                g|G)
+                    historiX_check_dangerous_commands
+                    ;;
+                h|H)
+                    historiX_suggest_aliases
                     ;;
                 *)
                     echo "Invalid info option."

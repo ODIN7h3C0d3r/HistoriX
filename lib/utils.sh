@@ -122,6 +122,31 @@ historiX_log() {
     echo "[$(date +'%Y-%m-%d %H:%M:%S')] [$level] $msg" >> "${LIB_DIR%/lib}/data/historiX.log"
 }
 
+# Theming support: set color scheme from config
+historiX_apply_theme() {
+    local theme=${THEME:-default}
+    case "$theme" in
+        dark)
+            export CYAN='\033[1;36m'
+            export YELLOW='\033[1;33m'
+            export RED='\033[1;31m'
+            export NC='\033[0m'
+            ;;
+        light)
+            export CYAN='\033[1;34m'
+            export YELLOW='\033[1;35m'
+            export RED='\033[1;31m'
+            export NC='\033[0m'
+            ;;
+        *)
+            export CYAN='\033[1;36m'
+            export YELLOW='\033[1;33m'
+            export RED='\033[1;31m'
+            export NC='\033[0m'
+            ;;
+    esac
+}
+
 # Example usage in analyzer (add to critical actions):
 # historiX_log "Archived history to $archivefile" "INFO"
 # historiX_log "Failed to find history file" "ERROR"
