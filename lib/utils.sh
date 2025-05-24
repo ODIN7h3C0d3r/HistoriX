@@ -113,3 +113,15 @@ historiX_show_config() {
         echo "No configuration file found."
     fi
 }
+
+# Logging and error reporting utility
+historiX_log() {
+    local msg level
+    msg="$1"
+    level="${2:-INFO}"
+    echo "[$(date +'%Y-%m-%d %H:%M:%S')] [$level] $msg" >> "${LIB_DIR%/lib}/data/historiX.log"
+}
+
+# Example usage in analyzer (add to critical actions):
+# historiX_log "Archived history to $archivefile" "INFO"
+# historiX_log "Failed to find history file" "ERROR"

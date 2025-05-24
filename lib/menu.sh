@@ -36,10 +36,10 @@ historiX_show_menu() {
                     historiX_trend_by_month
                     ;;
                 e|E)
-                    echo "[Session stats feature coming soon!]"
+                    historiX_session_stats
                     ;;
                 f|F)
-                    echo "[Length/complexity feature coming soon!]"
+                    historiX_command_length_complexity
                     ;;
                 *)
                     echo "Invalid analysis option."
@@ -54,10 +54,10 @@ historiX_show_menu() {
                     historiX_visualize_top_commands
                     ;;
                 b|B)
-                    echo "[Heatmap visualization coming soon!]"
+                    generate_heatmap
                     ;;
                 c|C)
-                    echo "[Pie chart visualization coming soon!]"
+                    historiX_visualize_pie_chart
                     ;;
                 *)
                     echo "Invalid visualization option."
@@ -72,10 +72,10 @@ historiX_show_menu() {
                     historiX_export_top_commands_csv
                     ;;
                 b|B)
-                    echo "[Full history JSON export coming soon!]"
+                    historiX_export_history_json
                     ;;
                 c|C)
-                    echo "[Printable report coming soon!]"
+                    historiX_export_printable_report
                     ;;
                 *)
                     echo "Invalid export option."
@@ -90,10 +90,10 @@ historiX_show_menu() {
                     historiX_deduplicate_history
                     ;;
                 b|B)
-                    echo "[Archive old history coming soon!]"
+                    historiX_archive_old_history
                     ;;
                 c|C)
-                    echo "[Secure erase coming soon!]"
+                    historiX_secure_erase
                     ;;
                 *)
                     echo "Invalid cleanup option."
@@ -101,8 +101,8 @@ historiX_show_menu() {
             esac
             ;;
         7)
-            echo -e "${YELLOW}Config Options:${NC} a) Show Config  b) Set Config Option"
-            read -p "Select config [a-b]: " subchoice
+            echo -e "${YELLOW}Config Options:${NC} a) Show Config  b) Set Config Option  c) Backup History  d) Restore History"
+            read -p "Select config [a-d]: " subchoice
             case $subchoice in
                 a|A)
                     historiX_show_config
@@ -112,6 +112,12 @@ historiX_show_menu() {
                     read -p "Enter value for $key: " value
                     historiX_set_config "$key" "$value"
                     echo "Config updated."
+                    ;;
+                c|C)
+                    historiX_backup_history
+                    ;;
+                d|D)
+                    historiX_restore_history
                     ;;
                 *)
                     echo "Invalid config option."

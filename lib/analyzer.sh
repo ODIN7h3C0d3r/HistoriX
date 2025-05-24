@@ -110,3 +110,134 @@ historiX_export_top_commands_csv() {
     awk 'BEGIN{print "Count,Command"} {print $1 "," $2}' > "$outfile"
     echo "Top commands exported to $outfile"
 }
+
+# Export: Full history as JSON
+historiX_export_history_json() {
+    local histfile outfile
+    histfile=$(historiX_detect_shell_and_history)
+    outfile="${HOME}/historiX_full_history_$(date +%Y%m%d%H%M%S).json"
+    if [ -z "$histfile" ]; then
+        echo "No history file found."
+        return 1
+    fi
+    echo "[Exporting full history as JSON]"
+    echo '[' > "$outfile"
+    grep -v '^#' "$histfile" | sed 's/^: [0-9]*:[0-9]*;//' | awk '{gsub("\"", "\\\""); printf "  \"%s\",\n", $0}' | sed '$ s/,$//' >> "$outfile"
+    echo ']' >> "$outfile"
+    echo "Full history exported to $outfile"
+}
+
+# Export: Printable report (text)
+historiX_export_printable_report() {
+    local histfile outfile
+    histfile=$(historiX_detect_shell_and_history)
+    outfile="${HOME}/historiX_report_$(date +%Y%m%d%H%M%S).txt"
+    if [ -z "$histfile" ]; then
+        echo "No history file found."
+        return 1
+    fi
+    echo "[HistoriX Report]" > "$outfile"
+    echo "Top Commands:" >> "$outfile"
+    grep -v '^#' "$histfile" | sed 's/^: [0-9]*:[0-9]*;//' | awk '{print $1}' | sort | uniq -c | sort -rn | head -10 >> "$outfile"
+    echo >> "$outfile"
+    echo "Session Stats:" >> "$outfile"
+    # Simple session stats (count)
+    grep -v '^#' "$histfile" | wc -l | awk '{print "Total commands:", $1}' >> "$outfile"
+    echo "Report exported to $outfile"
+}
+
+# Session and Duration Stats: Analyze session lengths and idle times
+historiX_session_stats() {
+    local histfile histfmt
+    histfile=$(historiX_detect_shell_and_history)
+    histfmt=$(historiX_get_history_format)
+    if [ -z "$histfile" ]; then
+        echo "No history file found."
+        return 1
+    fi
+    echo "[Session and Duration Stats]"
+    if [[ "$histfmt" == zsh-timestamped ]]; then
+        awk -F: '/^:/ {t=$2; getline cmd; print t}' "$histfile" | \
+        awk '{if(NR==1) {start=$1; prev=$1} else {if($1-prev>1800) {print prev, $1, $1-prev}; prev=$1}}' | \
+        awk '{print "Session: ", strftime("%c", $1), "-", strftime("%c", $2), "Duration:", int(($2-$1)/60) " min"}'
+    elif [[ "$histfmt" == bash-timestamped ]]; then
+        awk '/^#/ {t=substr($0,2); getline cmd; print t}' "$histfile" | \
+        awk '{if(NR==1) {start=$1; prev=$1} else {if($1-prev>1800) {print prev, $1, $1-prev}; prev=$1}}' | \
+        awk '{print "Session: ", strftime("%c", $1), "-", strftime("%c", $2), "Duration:", int(($2-$1)/60) " min"}'
+    else
+        echo "Session stats require timestamped history."
+    fi
+}
+
+# Command Length & Complexity: Show longest/shortest and most complex commands
+historiX_command_length_complexity() {
+    local histfile
+    histfile=$(historiX_detect_shell_and_history)
+    if [ -z "$histfile" ]; then
+        echo "No history file found."
+        return 1
+    fi
+    echo "[Longest Commands]"
+    grep -v '^#' "$histfile" | sed 's/^: [0-9]*:[0-9]*;//' | awk '{print length, $0}' | sort -nr | head -5
+    echo
+    echo "[Shortest Commands]"
+    grep -v '^#' "$histfile" | sed 's/^: [0-9]*:[0-9]*;//' | awk '{print length, $0}' | sort -n | head -5
+    echo
+    echo "[Most Complex Commands (by pipes/args)]"
+    grep -v '^#' "$histfile" | sed 's/^: [0-9]*:[0-9]*;//' | awk '{print gsub(/\|/,"|") + NF, $0}' | sort -nr | head -5
+}
+
+# Archive old history (move to archive file with timestamp)
+historiX_archive_old_history() {
+    local histfile archivefile
+    histfile=$(historiX_detect_shell_and_history)
+    if [ -z "$histfile" ]; then
+        echo "No history file found."
+        return 1
+    fi
+    archivefile="${histfile}.archive.$(date +%Y%m%d%H%M%S)"
+    cp "$histfile" "$archivefile"
+    echo > "$histfile"
+    echo "History archived to $archivefile and current history cleared."
+}
+
+# Securely erase sensitive commands (by keyword)
+historiX_secure_erase() {
+    local histfile keyword tmpfile
+    histfile=$(historiX_detect_shell_and_history)
+    if [ -z "$histfile" ]; then
+        echo "No history file found."
+        return 1
+    fi
+    read -p "Enter keyword to securely erase from history: " keyword
+    tmpfile="${histfile}.tmp"
+    grep -v "$keyword" "$histfile" > "$tmpfile"
+    shred -u "$histfile"
+    mv "$tmpfile" "$histfile"
+    echo "All commands containing '$keyword' have been securely erased."
+}
+
+# Maintenance: Backup and restore history
+historiX_backup_history() {
+    local histfile backupfile
+    histfile=$(historiX_detect_shell_and_history)
+    if [ -z "$histfile" ]; then
+        echo "No history file found."
+        return 1
+    fi
+    backupfile="${histfile}.backup.$(date +%Y%m%d%H%M%S)"
+    cp "$histfile" "$backupfile"
+    echo "Backup created: $backupfile"
+}
+
+historiX_restore_history() {
+    local histfile backupfile
+    histfile=$(historiX_detect_shell_and_history)
+    read -p "Enter backup file to restore: " backupfile
+    if [ ! -f "$backupfile" ]; then
+        echo "Backup file not found."
+        return 1
+    fi
+    cp "$backupfile" "$histfile"
+    echo "History restored from $backupfile."
+}
