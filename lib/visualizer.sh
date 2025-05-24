@@ -13,5 +13,9 @@ historiX_visualize_top_commands() {
     sed 's/^: [0-9]*:[0-9]*;//' | \
     awk '{print $1}' | \
     sort | uniq -c | sort -rn | head -10 | \
-    awk '{printf "%10s | %s\n", $2, str_repeat("#", $1)}' str_repeat() { s=""; for(i=0;i<$1;i++)s=s"#"; return s }
+    while read -r count cmd; do
+        bar=""
+        for ((i=0; i<count; i++)); do bar+="#"; done
+        printf "%10s | %s\n" "$cmd" "$bar"
+    done
 }

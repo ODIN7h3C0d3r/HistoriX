@@ -4,25 +4,13 @@
 historiX_show_menu() {
     clear
     historiX_ascii_banner
-    echo "Welcome to HistoriX!"
-    echo "====================="
-    echo "1) Show Features"
-    echo "2) Help"
-    echo "3) Analyze History (coming soon)"
-    echo "   a) Top Commands"
-    echo "   b) Usage by Hour"
-    echo "   c) Search History"
-    echo "   d) Trend by Month"
-    echo "   e) Remove Duplicates"
-    echo "   f) Export Top Commands (CSV)"
-    echo "4) Visualize History (coming soon)"
-    echo "   a) Top Commands Bar Chart"
-    echo "5) Exit"
-    echo "6) Show Shell Info"
-    echo "7) Core Summary"
-    echo "8) Show Config"
-    echo "9) Set Config Option"
-    echo
+    echo -e "${CYAN}Welcome to HistoriX!${NC}"
+    echo "================================================================================"
+    # 3x3 grid menu layout
+    echo -e "[1] Features      [2] Help         [3] Analyze"
+    echo -e "[4] Visualize     [5] Export       [6] Cleanup"
+    echo -e "[7] Config        [8] Info         [9] Exit"
+    echo "================================================================================"
     read -p "Select an option [1-9]: " choice
     case $choice in
         1)
@@ -32,12 +20,7 @@ historiX_show_menu() {
             historiX_show_help
             ;;
         3)
-            echo "a) Top Commands"
-            echo "b) Usage by Hour"
-            echo "c) Search History"
-            echo "d) Trend by Month"
-            echo "e) Remove Duplicates"
-            echo "f) Export Top Commands (CSV)"
+            echo -e "${YELLOW}Analysis Options:${NC} a) Top Commands  b) Usage by Hour  c) Search  d) Trend  e) Session Stats  f) Length/Complexity"
             read -p "Select analysis [a-f]: " subchoice
             case $subchoice in
                 a|A)
@@ -53,10 +36,10 @@ historiX_show_menu() {
                     historiX_trend_by_month
                     ;;
                 e|E)
-                    historiX_deduplicate_history
+                    echo "[Session stats feature coming soon!]"
                     ;;
                 f|F)
-                    historiX_export_top_commands_csv
+                    echo "[Length/complexity feature coming soon!]"
                     ;;
                 *)
                     echo "Invalid analysis option."
@@ -64,11 +47,17 @@ historiX_show_menu() {
             esac
             ;;
         4)
-            echo "a) Top Commands Bar Chart"
-            read -p "Select visualization [a]: " subchoice
+            echo -e "${YELLOW}Visualization:${NC} a) Top Commands Bar Chart  b) Heatmap  c) Pie Chart"
+            read -p "Select visualization [a-c]: " subchoice
             case $subchoice in
                 a|A)
                     historiX_visualize_top_commands
+                    ;;
+                b|B)
+                    echo "[Heatmap visualization coming soon!]"
+                    ;;
+                c|C)
+                    echo "[Pie chart visualization coming soon!]"
                     ;;
                 *)
                     echo "Invalid visualization option."
@@ -76,23 +65,80 @@ historiX_show_menu() {
             esac
             ;;
         5)
-            echo "Goodbye!"
-            exit 0
+            echo -e "${YELLOW}Export Options:${NC} a) Top Commands CSV  b) Full History JSON  c) Printable Report"
+            read -p "Select export [a-c]: " subchoice
+            case $subchoice in
+                a|A)
+                    historiX_export_top_commands_csv
+                    ;;
+                b|B)
+                    echo "[Full history JSON export coming soon!]"
+                    ;;
+                c|C)
+                    echo "[Printable report coming soon!]"
+                    ;;
+                *)
+                    echo "Invalid export option."
+                    ;;
+            esac
             ;;
         6)
-            historiX_show_shell_info
+            echo -e "${YELLOW}Cleanup Options:${NC} a) Remove Duplicates  b) Archive Old History  c) Secure Erase"
+            read -p "Select cleanup [a-c]: " subchoice
+            case $subchoice in
+                a|A)
+                    historiX_deduplicate_history
+                    ;;
+                b|B)
+                    echo "[Archive old history coming soon!]"
+                    ;;
+                c|C)
+                    echo "[Secure erase coming soon!]"
+                    ;;
+                *)
+                    echo "Invalid cleanup option."
+                    ;;
+            esac
             ;;
         7)
-            historiX_show_core_summary
+            echo -e "${YELLOW}Config Options:${NC} a) Show Config  b) Set Config Option"
+            read -p "Select config [a-b]: " subchoice
+            case $subchoice in
+                a|A)
+                    historiX_show_config
+                    ;;
+                b|B)
+                    read -p "Enter config key: " key
+                    read -p "Enter value for $key: " value
+                    historiX_set_config "$key" "$value"
+                    echo "Config updated."
+                    ;;
+                *)
+                    echo "Invalid config option."
+                    ;;
+            esac
             ;;
         8)
-            historiX_show_config
+            echo -e "${YELLOW}Info:${NC} a) Shell Info  b) Core Summary  c) About"
+            read -p "Select info [a-c]: " subchoice
+            case $subchoice in
+                a|A)
+                    historiX_show_shell_info
+                    ;;
+                b|B)
+                    historiX_show_core_summary
+                    ;;
+                c|C)
+                    echo "HistoriX - Bash History Analyzer v0.1.0 by Onyx"
+                    ;;
+                *)
+                    echo "Invalid info option."
+                    ;;
+            esac
             ;;
         9)
-            read -p "Enter config key: " key
-            read -p "Enter value for $key: " value
-            historiX_set_config "$key" "$value"
-            echo "Config updated."
+            echo "Goodbye!"
+            exit 0
             ;;
         *)
             echo "Invalid option."
