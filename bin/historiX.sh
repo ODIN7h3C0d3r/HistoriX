@@ -12,6 +12,7 @@ source "$LIB_DIR/analyzer.sh"
 source "$LIB_DIR/visualizer.sh"
 source "$LIB_DIR/utils.sh"
 source "$LIB_DIR/features.sh"
+source "$LIB_DIR/plugins.sh"
 
 # Parse arguments
 case "$1" in
