@@ -11,6 +11,10 @@ historiX_show_menu() {
     echo "3) Analyze History (coming soon)"
     echo "   a) Top Commands"
     echo "   b) Usage by Hour"
+    echo "   c) Search History"
+    echo "   d) Trend by Month"
+    echo "   e) Remove Duplicates"
+    echo "   f) Export Top Commands (CSV)"
     echo "4) Visualize History (coming soon)"
     echo "   a) Top Commands Bar Chart"
     echo "5) Exit"
@@ -30,13 +34,29 @@ historiX_show_menu() {
         3)
             echo "a) Top Commands"
             echo "b) Usage by Hour"
-            read -p "Select analysis [a-b]: " subchoice
+            echo "c) Search History"
+            echo "d) Trend by Month"
+            echo "e) Remove Duplicates"
+            echo "f) Export Top Commands (CSV)"
+            read -p "Select analysis [a-f]: " subchoice
             case $subchoice in
                 a|A)
                     historiX_analyze_history
                     ;;
                 b|B)
                     historiX_analyze_by_hour
+                    ;;
+                c|C)
+                    historiX_search_history
+                    ;;
+                d|D)
+                    historiX_trend_by_month
+                    ;;
+                e|E)
+                    historiX_deduplicate_history
+                    ;;
+                f|F)
+                    historiX_export_top_commands_csv
                     ;;
                 *)
                     echo "Invalid analysis option."
