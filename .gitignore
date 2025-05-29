@@ -1,0 +1,39 @@
+# HistoriX .gitignore
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor/IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Logs and temp
+*.log
+*.tmp
+*.bak
+*.archive.*
+*.backup.*
+
+# Data/output
+/data/*.csv
+/data/*.json
+/data/*.txt
+/data/*.html
+
+# User history and sensitive
+*.history
+
+# Test outputs
+/test/*.out
+/test/*.log
+
+# Ignore generated session replay scripts
+historiX_session_replay_*.sh
+historiX_merged_history_*.txt
+
+# Ignore plugin test files
+/plugins/*.test.sh
