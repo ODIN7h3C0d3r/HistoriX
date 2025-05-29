@@ -7,7 +7,7 @@ historiX_ascii_banner() {
     YELLOW='\033[1;33m'
     CYAN='\033[1;36m'
     NC='\033[0m' # No Color
-    VERSION="v0.1.0"
+    VERSION="v0.2.1"
     echo -e "${RED}"
     cat << 'EOF'
 
