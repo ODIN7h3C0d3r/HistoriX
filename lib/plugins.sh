@@ -14,25 +14,33 @@
 #   - Use historiX_list_plugin_functions to list all loaded plugin functions.
 #   - Use historiX_run_plugin <function_name> to run a plugin by function name.
 
-# Load all plugins (source in main shell for API access)
+# Load all plugins (source in main shell for API access, with error handling)
 historiX_load_plugins() {
     local plugin_dir="${LIB_DIR%/lib}/plugins"
     if [ -d "$plugin_dir" ]; then
         for plugin in "$plugin_dir"/*.sh; do
             [ -e "$plugin" ] || continue
-            # Source plugin in main shell (functions become available)
-            source "$plugin"
-            # Optionally, print plugin metadata
-            if grep -q '^# Plugin:' "$plugin"; then
-                local name version author desc
-                name=$(grep '^# Plugin:' "$plugin" | head -1 | cut -d: -f2- | xargs)
-                version=$(grep '^# Version:' "$plugin" | head -1 | cut -d: -f2- | xargs)
-                author=$(grep '^# Author:' "$plugin" | head -1 | cut -d: -f2- | xargs)
-                desc=$(grep '^# Description:' "$plugin" | head -1 | cut -d: -f2- | xargs)
-                echo "[PLUGIN] $name v$version by $author - $desc"
+            # Try to source plugin, catch errors
+            if ! source "$plugin"; then
+                echo "[PLUGIN ERROR] Failed to load $(basename "$plugin")" >&2
+                continue
             fi
+            # Print all plugin metadata
+            local name version author desc
+            name=$(grep '^# Plugin:' "$plugin" | head -1 | cut -d: -f2- | xargs)
+            version=$(grep '^# Version:' "$plugin" | head -1 | cut -d: -f2- | xargs)
+            author=$(grep '^# Author:' "$plugin" | head -1 | cut -d: -f2- | xargs)
+            desc=$(grep '^# Description:' "$plugin" | head -1 | cut -d: -f2- | xargs)
+            echo "[PLUGIN] $name v$version by $author - $desc"
         done
     fi
+}
+
+# Unload a plugin function from the shell session
+historiX_unload_plugin() {
+    local func="$1"
+    unset -f "$func"
+    echo "Plugin function '$func' unloaded."
 }
 
 # List available plugins by file name

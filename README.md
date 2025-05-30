@@ -30,6 +30,8 @@
 - [Contributing](#contributing)
 - [License](#license)
 - [Credits](#credits)
+- [Troubleshooting](#troubleshooting)
+- [CLI Plugin Options](#cli-plugin-options)
 
 ---
 
@@ -409,3 +411,15 @@ Created by ODIN7h3C0d3r.ASCII art and menu design inspired by the open source co
 - Example architecture diagram above uses Mermaid (rendered on GitHub or VS Code).
 
 ---
+
+## Troubleshooting
+
+- **Plugin not loading:** Check for syntax errors in your plugin. Use the Plugin Manager to see error messages.
+- **Missing dependencies:** Some features require tools like `gnuplot`, `inotifywait`, or `gpg`. Install them as needed.
+- **Color issues:** Set `DISABLE_COLOR=yes` in your environment or config to disable color output for accessibility.
+- **Config issues:** Use the Config menu to reload and validate your config. Warnings will be shown for invalid values.
+
+## CLI Plugin Options
+
+- List plugins: `./bin/historiX.sh --list-plugins`
+- Run a plugin: `./bin/historiX.sh --run-plugin historiX_plugin_greet_user`

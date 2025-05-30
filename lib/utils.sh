@@ -114,6 +114,37 @@ historiX_show_config() {
     fi
 }
 
+# Validate configuration values and warn about invalid settings
+historiX_validate_config() {
+    local valid=1
+    # Validate theme
+    case "$theme" in
+        default|dark|light|solarized) : ;;
+        *) echo "Warning: Invalid theme '$theme' in config."; valid=0 ;;
+    esac
+    # Validate dangerous_alerts
+    case "$dangerous_alerts" in
+        yes|no) : ;;
+        *) echo "Warning: Invalid dangerous_alerts value '$dangerous_alerts'."; valid=0 ;;
+    esac
+    # Validate plugins_enabled
+    case "$plugins_enabled" in
+        yes|no) : ;;
+        *) echo "Warning: Invalid plugins_enabled value '$plugins_enabled'."; valid=0 ;;
+    esac
+    # Validate default_report_format
+    case "$default_report_format" in
+        markdown|html|csv|json) : ;;
+        *) echo "Warning: Invalid default_report_format '$default_report_format'."; valid=0 ;;
+    esac
+    # Validate audit_log
+    case "$audit_log" in
+        yes|no) : ;;
+        *) echo "Warning: Invalid audit_log value '$audit_log'."; valid=0 ;;
+    esac
+    return $valid
+}
+
 # Logging and error reporting utility
 historiX_log() {
     local msg level
@@ -125,6 +156,10 @@ historiX_log() {
 # Theming support: set color scheme from config
 historiX_apply_theme() {
     local theme=${THEME:-default}
+    if [ "$DISABLE_COLOR" = "yes" ]; then
+        export CYAN=''; export YELLOW=''; export RED=''; export NC=''
+        return
+    fi
     case "$theme" in
         dark)
             export CYAN='\033[1;36m'

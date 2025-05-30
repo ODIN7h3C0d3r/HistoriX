@@ -15,6 +15,13 @@ source "$LIB_DIR/utils.sh"
 source "$LIB_DIR/features.sh"
 source "$LIB_DIR/plugins.sh"
 
+# Load config and validate at startup
+historiX_load_config
+historiX_validate_config
+if [ "$DISABLE_COLOR" = "yes" ]; then
+    export CYAN=''; export YELLOW=''; export RED=''; export NC=''
+fi
+
 # Function to source advanced modules on demand
 historiX_source_advanced_module() {
     case "$1" in
@@ -52,6 +59,18 @@ case "$1" in
         ;;
     --version|-v)
         echo "HistoriX version 0.1.0"
+        exit 0
+        ;;
+    --list-plugins)
+        historiX_list_plugins
+        exit 0
+        ;;
+    --run-plugin)
+        if [ -n "$2" ]; then
+            historiX_run_plugin "$2"
+        else
+            echo "Usage: $0 --run-plugin <function_name>"
+        fi
         exit 0
         ;;
     # ...other options can be added here...
