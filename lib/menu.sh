@@ -16,12 +16,15 @@ historiX_show_menu() {
     read -p "Select an option [1-9]: " choice
     case $choice in
         1)
+            # Show features list
             historiX_show_features
             ;;
         2)
+            # Show help menu
             historiX_show_help
             ;;
         3)
+            # Analysis submenu
             echo -e "${YELLOW}Analysis:${NC}"
             echo -e "  a) Top Commands      b) Usage by Hour      c) Search"
             echo -e "  d) Trend by Month    e) Session Stats      f) Length/Complexity"
@@ -29,28 +32,29 @@ historiX_show_menu() {
             echo -e "  j) Replay Session    k) Predict Next"
             read -p "Select analysis [a-k]: " subchoice
             case $subchoice in
-                a|A) historiX_analyze_history ;;
-                b|B) historiX_analyze_by_hour ;;
-                c|C) historiX_search_history ;;
-                d|D) historiX_trend_by_month ;;
-                e|E) historiX_session_stats ;;
-                f|F) historiX_command_length_complexity ;;
-                g|G) historiX_tag_command ;;
-                h|H) historiX_filter_by_tag ;;
-                i|I) historiX_timeline_drilldown ;;
-                j|J) historiX_replay_session ;;
-                k|K) historiX_predict_next_command ;;
+                a|A) historiX_analyze_history ;; # Top commands
+                b|B) historiX_analyze_by_hour ;; # Usage by hour
+                c|C) historiX_search_history ;; # Regex/keyword search
+                d|D) historiX_trend_by_month ;; # Trend by month
+                e|E) historiX_session_stats ;; # Session stats
+                f|F) historiX_command_length_complexity ;; # Command complexity
+                g|G) historiX_tag_command ;; # Tag command
+                h|H) historiX_filter_by_tag ;; # Filter by tag
+                i|I) historiX_timeline_drilldown ;; # Timeline drilldown
+                j|J) historiX_replay_session ;; # Session replay
+                k|K) historiX_predict_next_command ;; # ML prediction
                 *) echo "Invalid analysis option." ;;
             esac
             ;;
         4)
+            # Visualization submenu
             echo -e "${YELLOW}Visualization:${NC}"
             echo -e "  a) Top Commands Bar Chart   b) Heatmap   c) Pie Chart"
             read -p "Select visualization [a-c]: " subchoice
             case $subchoice in
-                a|A) historiX_visualize_top_commands ;;
-                b|B) generate_heatmap ;;
-                c|C) historiX_visualize_pie_chart ;;
+                a|A) historiX_visualize_top_commands ;; # ASCII bar chart
+                b|B) generate_heatmap ;; # Heatmap
+                c|C) historiX_visualize_pie_chart ;; # Pie chart
                 *) echo "Invalid visualization option." ;;
             esac
             ;;
@@ -321,17 +325,29 @@ historiX_cli_animations_demo() {
 # Plugin manager menu for HistoriX advanced features
 historiX_plugin_manager() {
     echo -e "${YELLOW}Plugin Manager:${NC}"
-    echo -e "  a) List Plugins   b) Load Plugins   c) Back"
-    read -p "Select plugin option [a-c]: " subchoice
+    echo -e "  a) List Plugins   b) Load Plugins   c) Run Plugin by Name   d) Back"
+    read -p "Select plugin option [a-d]: " subchoice
     case $subchoice in
         a|A)
+            # List available plugins (by file)
             historiX_list_plugins
             ;;
         b|B)
+            # Load plugins (sources all plugin scripts)
             historiX_load_plugins
             echo "Plugins loaded."
             ;;
         c|C)
+            # Run a plugin by function name (must be loaded)
+            read -p "Enter plugin function name (e.g., historiX_plugin_greet_user): " plugin_func
+            if type "$plugin_func" &>/dev/null; then
+                "$plugin_func"
+            else
+                echo "Plugin function '$plugin_func' not found. Please load plugins first or check the name."
+            fi
+            ;;
+        d|D)
+            # Return to previous menu
             return
             ;;
         *) echo "Invalid plugin option." ;;

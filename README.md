@@ -353,6 +353,31 @@ HistoriX/
 - Add tests to `test/test_basic.sh`.
 - Use `set -e` and output validation for robust checks.
 
+### Writing Plugins (Quickstart)
+
+- Place your plugin script in the `plugins/` directory.
+- Use the prefix `historiX_plugin_` for all plugin functions (e.g., `historiX_plugin_myfeature`).
+- Add metadata at the top of your plugin:
+
+```bash
+# Plugin: MyPlugin
+# Version: 1.0
+# Author: YourName
+# Description: What this plugin does
+```
+
+- Plugin functions are sourced into the main shell and can be run from the Plugin Manager (Advanced > Enhanced Plugins > Run Plugin by Name).
+- Use `export -f historiX_plugin_myfeature` in your plugin if you want to ensure function export.
+- List all loaded plugin functions with `historiX_list_plugin_functions`.
+- Call a plugin by function name with `historiX_run_plugin historiX_plugin_myfeature`.
+
+### Automation (Quickstart)
+
+- Use the Workflow Automation menu (Advanced > Workflow Automation) to detect and export common command sequences.
+- Schedule custom reports using the Custom Reports menu (Advanced > Custom Reports > Schedule Report).
+- Reports and workflow scripts are saved to your home directory or the configured export directory.
+- See the test suite (`test/test_basic.sh`) for automation and export examples.
+
 ### Contributing
 
 - Fork, branch, and submit PRs with clear descriptions.

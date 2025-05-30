@@ -59,4 +59,38 @@ if [ -d plugins ]; then
   mv plugins.bak plugins
 fi
 
+# Test: plugin loading and function listing
+bash $HISTORIX --features > /dev/null # ensure env
+bash $HISTORIX <<EOF
+9
+e
+b
+EOF
+# Should load plugins
+bash $HISTORIX <<EOF
+9
+e
+a
+EOF | grep -q 'example_plugin.sh'
+# Test: run plugin by function name (greet_user)
+bash $HISTORIX <<EOF
+9
+e
+c
+historiX_plugin_greet_user
+EOF | grep -q 'Hello'
+# Test: workflow export
+bash $HISTORIX <<EOF
+9
+d
+b
+EOF | grep -q 'Workflow script exported'
+# Test: schedule report (simulate input)
+bash $HISTORIX <<EOF
+9
+c
+b
+0 8 * * *
+EOF | grep -q 'Report scheduled'
+
 echo "All advanced and edge case tests passed."
